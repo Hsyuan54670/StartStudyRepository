@@ -2,14 +2,27 @@ package com.xx.ui;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
 import java.util.Random;
 
-public class GameJFrame extends JFrame implements KeyListener {
+public class GameJFrame extends JFrame implements KeyListener , ActionListener {
+    private static int countMove = 0;
     private final int[] arr={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     private String locateImage="";
+    //创建菜单条目
+    private JMenuItem animalItem = new JMenuItem("Animal");
+    private JMenuItem girlItem = new JMenuItem("Girl");
+    private JMenuItem sportItem = new JMenuItem("Sport");
+
+    private JMenuItem rePlayItem = new JMenuItem("Replay"); //重新开始
+    private JMenuItem reLoginItem = new JMenuItem("ReLogin");//重新登录
+    private JMenuItem exitItem = new JMenuItem("Exit");//退出游戏
+
+    private JMenuItem accountItem = new JMenuItem("Account"); //关于我们
     public GameJFrame() {
         //初始化界面
         initJFrame();
@@ -21,7 +34,7 @@ public class GameJFrame extends JFrame implements KeyListener {
         initArr();
 
         //初始化选择图片
-        initImage();
+        initImage(null);
 
         //显示图片
         showImage();
@@ -48,7 +61,7 @@ public class GameJFrame extends JFrame implements KeyListener {
     }
 
     //初始化图片从Image包中随机选一个
-    private void initImage() {
+    private void initImage(Integer kindOf) {
         /*
         该段注释主要是介绍如何将图片显示的过程
         图片是105*105的
@@ -72,7 +85,10 @@ public class GameJFrame extends JFrame implements KeyListener {
         final int ANIMAL_NUMBER = 8;
         final int GIRL_NUMBER = 13;
         final int SPORT_NUMBER = 10;
-        switch (rand.nextInt(3)) {
+        if(kindOf==null) {
+            kindOf=rand.nextInt(3);
+        }
+        switch (kindOf) {
             case 0->kind="animal";
             case 1->kind="girl";
             case 2->kind="sport";
@@ -97,9 +113,58 @@ public class GameJFrame extends JFrame implements KeyListener {
         */
 
     }
+    /*
+    //重载方法，用于用户主动更换图片
+    private void initImage(int kindOf) {
 
+        //生成随机打乱的图片
+        Random rand = new Random();
+        rand.nextInt(3);
+        String kind = "";
+        final int ANIMAL_NUMBER = 8;
+        final int GIRL_NUMBER = 13;
+        final int SPORT_NUMBER = 10;
+        switch (kindOf) {
+            case 0->kind="animal";
+            case 1->kind="girl";
+            case 2->kind="sport";
+        }
+        String kindNumber="";
+        switch (kind) {
+            case "animal"->kindNumber=kind+String.valueOf(rand.nextInt(ANIMAL_NUMBER)+1);
+            case "girl"->kindNumber=kind+String.valueOf(rand.nextInt(GIRL_NUMBER)+1);
+            case "sport"->kindNumber=kind+String.valueOf(rand.nextInt(SPORT_NUMBER)+1);
+        }
+        final String locate="jigsawgame\\image";      //采用相对路径
+        locateImage =locate+"\\"+kind+"\\"+kindNumber+"\\";
+        /*
+        按顺序将图片显示
+        for(int i=0;i<15;i++){
+            String imageLastNumber=locateImage+String.valueOf(i+1)+".jpg";
+            System.out.println(imageLastNumber);
+            JLabel jLabel = new JLabel(new ImageIcon(imageLastNumber));
+            jLabel.setBounds(i%4*105,i/4*105,105,105);
+            this.getContentPane().add(jLabel);
+        }
+        ///
+    }
+    */
     private void showImage() {
-
+        this.getContentPane().removeAll();   //清空内容
+        //加载内容
+        //显示计数器
+        JLabel countLabel=new JLabel("步数："+countMove);
+        countLabel.setBounds(50,10,100,50);
+        this.getContentPane().add(countLabel);
+        //判断是否胜利
+        if(isWin()){
+            //显示胜利图标
+            JLabel winLabel = new JLabel(new ImageIcon("jigsawgame\\image\\win.png"));
+            winLabel.setBounds(400, 5, winLabel.getPreferredSize().width, winLabel.getPreferredSize().height);
+            this.getContentPane().add(winLabel);
+            //关闭键盘监听
+            this.removeKeyListener(this);
+        }
         for(int i=0;i<=15;i++){
             String imageLastNumber=locateImage+String.valueOf(arr[i])+".jpg";
             //System.out.println(imageLastNumber);
@@ -115,6 +180,8 @@ public class GameJFrame extends JFrame implements KeyListener {
         JLabel backgroundLabel = new JLabel(new ImageIcon("jigsawgame\\image\\background.png"));
         backgroundLabel.setBounds(40, 40, backgroundLabel.getPreferredSize().width, backgroundLabel.getPreferredSize().height);
         this.getContentPane().add(backgroundLabel);
+
+        this.getContentPane().repaint();   //重写内容
     }
 
 
@@ -125,17 +192,25 @@ public class GameJFrame extends JFrame implements KeyListener {
         //创建菜单选项
         JMenu functionJMenu = new JMenu("Function");
         JMenu aboutJMenu = new JMenu("About");
-        //创建菜单条目
-        JMenuItem rePlayItem = new JMenuItem("Replay");
-        JMenuItem reLoginItem = new JMenuItem("ReLogin");
-        JMenuItem exitItem = new JMenuItem("Exit");
-
-        JMenuItem accountItem = new JMenuItem("Account");
+        JMenu changeItem = new JMenu("ChangeImage"); //更换图片
 
         //组合菜单条目
+        functionJMenu.add(changeItem);
+        changeItem.add(animalItem);
+        changeItem.add(girlItem);
+        changeItem.add(sportItem);
+
         functionJMenu.add(rePlayItem);
         functionJMenu.add(reLoginItem);
         functionJMenu.add(exitItem);
+        //添加动作监听
+        rePlayItem.addActionListener(this);
+        reLoginItem.addActionListener(this);
+        exitItem.addActionListener(this);
+        accountItem.addActionListener(this);
+        animalItem.addActionListener(this);
+        girlItem.addActionListener(this);
+        sportItem.addActionListener(this);
 
         aboutJMenu.add(accountItem);
 
@@ -191,6 +266,7 @@ public class GameJFrame extends JFrame implements KeyListener {
             if(indexZero>=4) {
                 arr[indexZero]=arr[indexZero-4];
                 arr[indexZero-4]=0;
+                countMove++;
             }else{
                 System.out.println("非法移动!");
             }
@@ -200,6 +276,7 @@ public class GameJFrame extends JFrame implements KeyListener {
             }else {
                 arr[indexZero]=arr[indexZero+4];
                 arr[indexZero+4]=0;
+                countMove++;
             }
         }else if(e.getKeyCode()==39){
             if(indexZero%4==0) {
@@ -207,6 +284,7 @@ public class GameJFrame extends JFrame implements KeyListener {
             }else {
                 arr[indexZero]=arr[indexZero-1];
                 arr[indexZero-1]=0;
+                countMove++;
             }
         }else if(e.getKeyCode()==37){
             if(indexZero%4==3) {
@@ -214,9 +292,12 @@ public class GameJFrame extends JFrame implements KeyListener {
             }else{
                 arr[indexZero]=arr[indexZero+1];
                 arr[indexZero+1]=0;
+                countMove++;
             }
         }else if(e.getKeyChar()=='w'){
             //w键一键作弊，直接胜利.
+            Random rand = new Random();
+            countMove=rand.nextInt(countMove,countMove+20);
             Arrays.sort(arr);
             for (int i = 0; i < arr.length; i++) {
                 arr[i]=arr[i]+1;
@@ -241,23 +322,7 @@ public class GameJFrame extends JFrame implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         //每次操作后判断是否完成拼图
-        if(isWin()) {
-            //显示胜利图标
-            this.getContentPane().removeAll();
-            this.getContentPane().repaint();
-            JLabel winLabel = new JLabel(new ImageIcon("jigsawgame\\image\\win.png"));
-            winLabel.setBounds(400, 5, winLabel.getPreferredSize().width, winLabel.getPreferredSize().height);
-            this.getContentPane().add(winLabel);
-            showImage();
-            //关闭键盘监听
-            this.removeKeyListener(this);
-        }else {
-            //更新内容
-            this.getContentPane().removeAll();
-            this.getContentPane().repaint();
-            showImage();
-        }
-
+        showImage();
     }
 
     //判断是否胜利
@@ -273,4 +338,46 @@ public class GameJFrame extends JFrame implements KeyListener {
     }
 
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source=e.getSource();
+        if(source==rePlayItem){
+            countMove=0;
+            initArr();
+            showImage();
+        }else if(source==reLoginItem){
+            //重新登录
+            this.setVisible(false);
+            new LoginJFrame();
+        }else if(source==exitItem){
+            System.exit(0);
+        }else if(source==accountItem){
+            showMyQR();
+        }else if(source==girlItem)
+        {
+            initImage(1);
+            showImage();
+        }else if(source==sportItem){
+            initImage(2);
+            showImage();
+        }else if(source==animalItem){
+            initImage(0);
+            showImage();
+        }
+    }
+    //展示我的二维码
+
+    //ps:创建图像对象后，往往要记得设置大小后还要添加进上一级的容器中
+    private void showMyQR() {
+        JDialog qrDialog = new JDialog();
+        qrDialog.setTitle("QRCode");
+        qrDialog.setSize(350,350);
+        qrDialog.setLocationRelativeTo(null); //居中
+        qrDialog.setAlwaysOnTop(true);  //置顶显示在上面
+        JLabel qrLabel = new JLabel(new ImageIcon("jigsawgame//image//myqr.jpg"));
+        qrLabel.setSize(250, 340);
+        qrDialog.getContentPane().add(qrLabel);
+        qrDialog.setModal(true);  //此页面未关闭时不能操作其他页面
+        qrDialog.setVisible(true);
+    }
 }

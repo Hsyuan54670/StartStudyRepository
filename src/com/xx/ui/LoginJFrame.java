@@ -4,6 +4,11 @@ import javax.swing.*;
 
 public class LoginJFrame extends JFrame {
     public LoginJFrame() {
+        //初始化界面
+        initJFrame();
+    }
+
+    private void initJFrame() {
         //设置标题
         this.setTitle("Login");
         //设置宽高
