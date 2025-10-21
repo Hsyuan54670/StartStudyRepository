@@ -7,14 +7,18 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
 
-public class LoginJFrame extends JFrame implements MouseListener, ActionListener {
+public class LoginJFrameV1 extends JFrame implements MouseListener, ActionListener {
     JLabel yzm =new JLabel(productYzm());
     JButton yzmButton =new JButton();
     JButton loginButton =new JButton();
     JButton registerButton =new JButton();
     String addressLocation="jigsawgame\\image\\login\\";
+    JLabel loginLabel =new JLabel(new ImageIcon(addressLocation + "登录按钮.png"));
+    JLabel registerLabel =new JLabel(new ImageIcon(addressLocation + "注册按钮.png"));
     JLabel background =new JLabel(new ImageIcon(addressLocation + "background.png"));
-    public LoginJFrame() {
+    JLabel loginLabeling =new JLabel(new ImageIcon(addressLocation + "登录按下.png"));
+    JLabel registerLabeling = new JLabel(new ImageIcon(addressLocation + "注册按下.png"));
+    public LoginJFrameV1() {
         //初始化界面
         initJFrame();
 
@@ -75,8 +79,11 @@ public class LoginJFrame extends JFrame implements MouseListener, ActionListener
         passwordLabel.setBounds(60, 150, 32, 16);
         yzmLabel.setBounds(60, 200,56, 21);
 
-        loginButton.setIcon(new ImageIcon(addressLocation + "登录按钮.png"));
-        registerButton.setIcon(new ImageIcon(addressLocation + "注册按钮.png"));
+
+
+        loginLabel.setBounds(100, 250, 128, 47);
+        registerLabel.setBounds(240, 250, 128, 47);
+
 
         background.setBounds(0, 0, 470, 390);
 
@@ -87,11 +94,13 @@ public class LoginJFrame extends JFrame implements MouseListener, ActionListener
         this.getContentPane().add(usernameField);
         this.getContentPane().add(passwordField);
         this.getContentPane().add(YZMField);
+        this.getContentPane().add(loginLabel);
+        this.getContentPane().add(registerLabel);
+        this.getContentPane().add(background);
         this.getContentPane().add(yzmButton);
         this.getContentPane().add(loginButton);
         this.getContentPane().add(registerButton);
-        this.getContentPane().add(background); //最后添加
-        this.getContentPane().repaint();
+
 
 
     }
@@ -147,13 +156,17 @@ public class LoginJFrame extends JFrame implements MouseListener, ActionListener
     @Override
     public void mouseEntered(MouseEvent e) {
         Object source = e.getSource();
-        //this.getContentPane().remove(background);
+        this.getContentPane().remove(background);
         if(e.getSource() == loginButton) {
-            loginButton.setIcon(new ImageIcon(addressLocation + "登录按下.png"));
+            loginLabeling.setBounds(100, 250, 128, 47);
+            this.getContentPane().add(loginLabeling);
+            this.getContentPane().remove(loginLabel);
         }else if(e.getSource() == registerButton) {
-            registerButton.setIcon(new ImageIcon(addressLocation + "注册按下.png"));
+            registerLabeling.setBounds(240, 250, 128, 47);
+            this.getContentPane().add(registerLabeling);
+            this.getContentPane().remove(registerLabel);
         }
-        //this.getContentPane().add(background);
+        this.getContentPane().add(background);
         this.getContentPane().repaint();
 
     }
@@ -163,9 +176,11 @@ public class LoginJFrame extends JFrame implements MouseListener, ActionListener
         Object source = e.getSource();
         this.getContentPane().remove(background);
         if(e.getSource()==loginButton) {
-            loginButton.setIcon(new ImageIcon(addressLocation + "登录按钮.png"));
+            this.getContentPane().add(loginLabel);
+            this.getContentPane().remove(loginLabeling);
         }else if(e.getSource()==registerButton){
-            registerButton.setIcon(new ImageIcon(addressLocation + "注册按钮.png"));
+            this.getContentPane().add(registerLabel);
+            this.getContentPane().remove(registerLabeling);
         }
         this.getContentPane().add(background);
         this.getContentPane().repaint();
